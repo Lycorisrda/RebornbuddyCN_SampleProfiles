@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Profile [
+<!ENTITY SelfRepair "1">
+<!-- 自动修理或找NPC修理 -->]>
+<Profile>
+	<Name>序列打怪脚本模板Book of Netherfall I - Snow Wolf</Name>
+	<KillRadius>50</KillRadius>
+	<GrindAreas>
+		<!-- 打怪区域设置开始 -->
+		<GrindArea name="1234">
+			<Hotspots>
+				<!-- 打怪区域热点，获取坐标填入XYZ轴 -->
+				<Hotspot Radius="115" XYZ="-206.7607, 230.8343, 561.8158" />
+				<Hotspot Radius="115" XYZ="-291.318, 225.9218, 508.243" />
+				<Hotspot Radius="115" XYZ="-395.409, 243.1734, 525.1923" />
+			</Hotspots>
+			<TargetMobs>
+				<!-- 怪物ID设置，通过XIVDB或者RebornConsole获取 -->
+				<TargetMob id="653" />
+			</TargetMobs>
+			<MinLevel>1</MinLevel>
+			<MaxLevel>50</MaxLevel>
+		</GrindArea>
+	</GrindAreas>
+	<!-- 打怪区域设置结束 -->
+	<Order>
+		<While Condition="True">
+			<If Condition="not Conditioner.NeedRepair(50)">
+				<If Condition="not IsOnMap(155)">
+					<!-- 传送地图设置 -->
+					<TeleportTo Name="Camp Dragonhead" AetheryteId="23" />
+				</If>
+				<Grind grindRef="1234" while="not Conditioner.NeedRepair(50)" />
+			</If>
+			<If Condition="Conditioner.NeedRepair(50)">
+				<If Condition="&SelfRepair; == 0">
+					<NPCRepair />
+				</If>
+				<If Condition="&SelfRepair; != 0">
+					<SelfRepair />
+				</If>
+			</If>
+		</While>
+	</Order>
+</Profile>

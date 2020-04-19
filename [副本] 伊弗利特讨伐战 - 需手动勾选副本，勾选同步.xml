@@ -1,0 +1,42 @@
+<Profile>
+    <Name>Ifrit Normal</Name>
+    <KillRadius>50</KillRadius>
+    <Order>
+        <While Condition="True">
+            <JoinDutyFinder />
+            <ExLog Message="进入副本" />
+            <CommenceDuty />
+            <ExLog Message="读图等待中" />
+            <WaitWhile Condition="not GameObjectManager.GetObjectByNPCId(1185)" />
+            <ExLog Message="发现BOSS" />
+            <RunCode Name="Forward" />
+            <Grind GrindRef="Fight" While="GameObjectManager.GetObjectByNPCId(1185)" />
+            <ExLog Message="等待出口刷新" />
+            <WaitWhile Condition="not GameObjectManager.GetObjectByNPCId(2000139)" />
+            <ExLog Message="退出副本" />
+            <LeaveDungeon YesnoPopup="Yes" />
+            <WaitTimer WaitTime="1" />
+        </While>
+    </Order>
+    <GrindAreas>
+        <GrindArea name="Fight">
+            <Hotspots>
+                <Hotspot Radius="120" XYZ="15,0,0" />
+                <!-- ZoneId: 202 -->
+            </Hotspots>
+            <TargetMobs>
+                <TargetMob Name="Ifrit" Id="1185" />
+            </TargetMobs>
+        </GrindArea>
+    </GrindAreas>
+	<CodeChunks>
+		<CodeChunk Name="Forward">
+			<![CDATA[
+        MovementManager.MoveForwardStart();
+        await Coroutine.Sleep(2000);
+        MovementManager.MoveForwardStop();
+        await Coroutine.Sleep(500);
+        ]]>
+		</CodeChunk>
+	</CodeChunks>
+</Profile>

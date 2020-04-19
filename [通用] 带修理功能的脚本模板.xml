@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Profile [
+<!ENTITY SelfRepair "1"><!-- 自动修理或找NPC修理 -->
+<!ENTITY RepairCondition "50"><!-- 自动修理或找NPC修理 -->
+
+]>
+<Profile>
+	<Name>Sample Profile</Name> <!-- 脚本名称 RB读取之后会显示的名称 -->
+	<KillRadius>50</KillRadius> <!-- 杀怪范围 无用 -->
+    <Order>
+        <!-- 最外层大循环，忽略条件判断永久循环 -->
+        <While Condition="true">
+            <!-- 判断角色装备耐久大于指定数值时，角色进行采集、打怪等等 -->
+            <If Condition="not Conditioner.NeedRepair(&RepairCondition;)">
+                <!--此处加入无需修理时角色做的其他事情的语句-->
+            </If>
+            <!-- 判断角色装备耐久小于指定数值时，角色进行装备修理。 -->
+            <If Condition="Conditioner.NeedRepair(&RepairCondition;)">
+				<If Condition="&SelfRepair; == 0">
+                    <!--视情况而定，有些NPC可能需要添加路径-->
+					<NPCRepair />
+				</If>
+				<If Condition="&SelfRepair; != 0">
+					<SelfRepair />
+				</If>
+            </If>
+        </While>
+    </Order>
+</Profile>

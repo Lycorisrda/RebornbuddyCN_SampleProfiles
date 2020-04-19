@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--User Configuration-->
+<!DOCTYPE Profile [	
+<!-- Enter exactly as the line appears -->
+<!ENTITY TouchLocation "62.88184, 207.8254, -16.79607">
+<!--摸水晶的坐标，如果卡水晶的话尝试修改这个坐标-->
+<!ENTITY AethernetText "都市传送网">	]>
+<!--
+	<ExUseAethernet XYZ="45.79224, 24.55164, 0.9917603" Id="80" AethernetText="&AethernetText;" Slot="0" />
+						 ↑以太之光坐标					↑以太之光ID		↑都市以太网文本						↑选择完文本之后的格数
+-->
+<Profile>
+	<Name>[O] 都市以太网互动</Name>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<While Condition="True">
+			<If Condition="IsOnMap(399)">
+				<ExMoveTo XYZ="-227.3836, 107.4758, -637.7277" Distance="3"/>
+			</If>
+			<ExMoveTo XYZ="&TouchLocation;" Distance="0"/>
+			<While Condition="not IsOnMap(399)">
+				<ExUseAethernet XYZ="&TouchLocation;" Id="75" AethernetText="&AethernetText;" Slot="2" />
+			</While>
+		</While>
+		<ExLog message="Profile Complete"/>
+	</Order>
+</Profile>

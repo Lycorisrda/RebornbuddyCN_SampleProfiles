@@ -1,0 +1,15 @@
+﻿<!DOCTYPE Profile [
+<!ENTITY Item_Id "12721, 12770, 12794, 12819, 12730, 12836, 12721, 12805">   
+<!-- 上方添加需要分解的ID -->
+]>
+
+<Profile>
+	<Name>物品分解 - 指定ID分解</Name>
+	<Author>Calleil</Author>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<While Condition="True">
+			<ExSalvage ItemIds="&Item_Id;"/>
+		</While>
+  </Order>
+</Profile>

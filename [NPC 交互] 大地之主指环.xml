@@ -1,0 +1,45 @@
+<Profile>
+	<Name>大地之主指环</Name>
+	<Author>Lycorisrda</Author>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<While Condition="True">
+			<If Condition="not HasAtLeast(14125,1) and HasAtLeast(12841,2)">
+				<RunCode Name="Exchange" />
+			</If>
+			<If Condition="HasAtLeast(14125,1)">
+				<ExSalvage ItemId="14125"/>
+			</If>
+		</While>
+	</Order>
+	<CodeChunks>
+		<CodeChunk Name="Exchange">
+			<![CDATA[ 
+			// interact npc
+			ff14bot.Managers.GameObjectManager.GetObjectByNPCId(1012229).Interact();
+			// select string
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => ff14bot.RemoteWindows.SelectIconString.IsOpen);
+			ff14bot.RemoteWindows.SelectIconString.ClickSlot(5);
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => RaptureAtkUnitManager.GetWindowByName("ShopExchangeItem")!=null);
+			RaptureAtkUnitManager.GetWindowByName("ShopExchangeItem").SendAction(2, 0, 0, 1, 19);
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => RaptureAtkUnitManager.GetWindowByName("ShopExchangeItemDialog")!=null);
+			// 交换道具
+			RaptureAtkUnitManager.GetWindowByName("ShopExchangeItemDialog").SendAction(1, 0, 0);
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => ff14bot.RemoteWindows.Request.IsOpen);
+			foreach(ff14bot.Managers.BagSlot slot in ff14bot.Managers.InventoryManager.FilledSlots)
+			{
+			// 物品ID
+				if(slot.RawItemId == 12841)
+				{
+					slot.Handover();
+				}
+			}
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => ff14bot.RemoteWindows.Request.HandOverButtonClickable);
+			ff14bot.RemoteWindows.Request.HandOver();
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => !ff14bot.RemoteWindows.Request.IsOpen);
+			await Buddy.Coroutines.Coroutine.Sleep(1000);
+			RaptureAtkUnitManager.GetWindowByName("ShopExchangeItem").SendAction(1, 3, uint.MaxValue);				
+		]]>
+		</CodeChunk>
+	</CodeChunks>
+</Profile>

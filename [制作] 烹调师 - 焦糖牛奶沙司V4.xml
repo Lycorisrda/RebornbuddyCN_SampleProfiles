@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Profile [
+  <!-- 启用回收 -->
+  <!ENTITY Reclaim "1">
+  <!-- 指定内静层数 -->
+  <!ENTITY IQ_Stack "9">
+]>
+<Profile>
+  <Name>Culinarian - 焦糖牛奶沙司V4 - NQ材料优先 - 俭约II+仓促带回收</Name><!-- 60级70耐1星配方 替换其他职业需要替换对应ActionID -->
+  <Order>
+    <StopCrafting/>
+    <WaitTimer WaitTime="3"/>
+    <While Condition="True">
+      <LogMessage Message="制作——焦糖牛奶沙司" /><!-- 作业746, 加工664, CP453 -->
+      <EatFood ItemId="12861" Name="洋葱焗奶油汤" HqOnly="True" MinDuration="2" />
+      <Synthesize RecipeId="31222" RequiredSkills="100136,100098,286,100098,100098,281,285,100108,100108,100108,100108,281,100108,100108,100108,100108,100098,100108,100098,281,100108,284,283,100009,100069,100069,100069,100069" MinimumCp="453" HQMats="-2, -2, -2, -2, -2, -2" />
+      <While Condition="CraftingManager.IsCrafting">
+        <!-- 固定起手 453 -->
+        <CraftAction ActionId="100136" Name="坚信" /><!-- 447 -->
+        <RunCode Name="ToT" /><!-- 453 -->
+        <CraftAction ActionId="286" Name="安逸" /><!-- 381/ 387 -->
+        <RunCode Name="ToT" /><!-- 415    -->
+        <CraftAction ActionId="259" Name="内静" /><!-- 371/ 405-->
+        <!-- <CraftActionByName Name="Inner Quiet" />-->
+        <RunCode Name="ToT" /><!-- 433 -->
+        <!-- 起手结束 -->
+        <CraftAction ActionId="281" Name="稳手 II" />
+        <CraftAction ActionId="285" Name="俭约 II" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <CraftAction ActionId="100108" Name="仓促" />        
+        <CraftAction ActionId="281" Name="稳手 II" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <!-- 上方固定阶段 min:295 -->
+        <If Condition="Core.Player.CurrentCP &lt; 296">
+          <CraftAction ActionId="100108" Name="仓促" />
+          <CraftAction ActionId="100108" Name="仓促" />
+        </If>
+        <If Condition="Core.Player.CurrentCP &gt; 314">
+          <CraftAction ActionId="100108" Name="仓促" />
+          <RunCode Name="UsePreciseTouch" />          
+        </If>
+        <If Condition="Core.Player.CurrentCP &gt; 334">
+          <RunCode Name="UsePreciseTouch" />
+          <RunCode Name="UsePreciseTouch" />          
+        </If>
+        <RunCode Name="ToT" />
+        <!-- Part II -->
+        <CraftAction ActionId="100110" Name="精修 II" /><!-- 135 -->
+        <!-- <CraftActionByName Name="Master's Mend II" /> -->
+        <RunCode Name="ToT" />
+        <CraftAction ActionId="100108" Name="仓促" />
+        <RunCode Name="ToT" />
+        <CraftAction ActionId="281" Name="稳手 II" />
+        <If Condition="Core.Player.CurrentCP &lt; 122">
+          <CraftAction ActionId="100108" Name="仓促" />
+        </If>
+        <!-- 110 - 4 106+18-->
+        <If Condition="Core.Player.CurrentCP &gt; 123">
+          <RunCode Name="UsePreciseTouch" />
+        </If>
+        <!-- 未达到指定内静层数，使用回收 -->
+        <If Condition="&Reclaim; != 0 and Core.Player.CharacterAuras.GetAuraStacksById(251) &lt; &IQ_Stack;">
+          <CraftAction ActionId="287" Name="Reclaim" />
+          <CraftAction ActionId="100108" Name="仓促" />
+          <CraftAction ActionId="100108" Name="仓促" />
+          <CraftAction ActionId="100108" Name="仓促" />
+          <CraftAction ActionId="100108" Name="仓促" />
+          <CraftAction ActionId="100108" Name="仓促" />
+          <CraftAction ActionId="100108" Name="仓促" />
+        </If>
+        <RunCode Name="BBCheck"/>
+        <CraftAction ActionId="267" Name="阔步" />
+        <!-- <CraftActionByName Name="Great Strides" />-->
+        <RunCode Name="BBCheck"/>        
+        <CraftAction ActionId="284" Name="改革" />
+        <RunCode Name="BBCheck2"/>
+        <CraftAction ActionId="283" Name="新颖 II" />
+        <CraftAction ActionId="100009" Name="比尔格的祝福" />
+        <CraftAction ActionId="100069" Name="模范制作 II" />
+        <CraftAction ActionId="100069" Name="模范制作 II" />
+        <CraftAction ActionId="100069" Name="模范制作 II" />
+        <CraftAction ActionId="100069" Name="模范制作 II" />
+      </While>
+    </While>
+  </Order>
+  <CodeChunks>
+    <CodeChunk Name="UsePreciseTouch"><![CDATA[SpellData data;   if ((CraftingManager.Condition == CraftingCondition.Good || CraftingManager.Condition == CraftingCondition.Excellent) &&    Actionmanager.CurrentActions.TryGetValue("Precise Touch", out data) && Actionmanager.CanCast(data, null)) {   Actionmanager.DoAction("Precise Touch", null);    Logging.Write(Colors.Azure,"[制作步骤] 高品质，使用 集中加工"); }   else {  Logging.Write(Colors.Azure,"[制作步骤] 普通品质，使用 加工");  Actionmanager.DoAction("Basic Touch", null);  }   await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); await Coroutine.Sleep(250);]]></CodeChunk>
+    <CodeChunk Name="ToT"><![CDATA[SpellData data; if ((CraftingManager.Condition == CraftingCondition.Good || CraftingManager.Condition == CraftingCondition.Excellent) && Actionmanager.CurrentActions.TryGetValue("Tricks of the Trade", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Tricks of the Trade", null); Logging.Write(Colors.Azure,"[制作步骤] 高品质，使用 秘诀"); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250);]]></CodeChunk>
+    <CodeChunk name="BBCheck">
+      <![CDATA[ SpellData data; if (CraftingManager.Condition == CraftingCondition.Excellent) { if(Actionmanager.CurrentActions.TryGetValue("Byregot's Blessing", out data) && Actionmanager.CanCast(data, null))  { Logging.Write(Colors.Azure,"[制作步骤] 最高品质，使用 比尔格的祝福"); Actionmanager.DoAction("Byregot's Blessing", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Ingenuity II", out data) && Actionmanager.CanCast(data, null))  { Logging.Write(Colors.Azure,"[制作步骤] 使用 新颖II"); Actionmanager.DoAction("Ingenuity II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250);if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } } await Coroutine.Sleep(250);         ]]></CodeChunk>
+    <CodeChunk name="BBCheck2">
+      <![CDATA[ SpellData data; if (CraftingManager.Condition == CraftingCondition.Excellent || CraftingManager.Condition == CraftingCondition.Good) { if(Actionmanager.CurrentActions.TryGetValue("Byregot's Blessing", out data) && Actionmanager.CanCast(data, null))  { Logging.Write(Colors.Azure,"[制作步骤] 最高品质/高品质，使用 比尔格的祝福"); Actionmanager.DoAction("Byregot's Blessing", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Ingenuity II", out data) && Actionmanager.CanCast(data, null))  { Logging.Write(Colors.Azure,"[制作步骤] 使用 新颖II"); Actionmanager.DoAction("Ingenuity II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250);if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } await Coroutine.Sleep(250); if (Actionmanager.CurrentActions.TryGetValue("Careful Synthesis II", out data) && Actionmanager.CanCast(data, null))  { Actionmanager.DoAction("Careful Synthesis II", null); await Coroutine.Wait(10000, () => CraftingManager.AnimationLocked); await Coroutine.Wait(Timeout.Infinite, () => !CraftingManager.AnimationLocked); } } await Coroutine.Sleep(250);         ]]></CodeChunk>
+
+  </CodeChunks>
+</Profile>

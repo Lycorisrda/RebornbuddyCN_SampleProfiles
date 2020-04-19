@@ -1,0 +1,13 @@
+<!DOCTYPE Profile []>
+<Profile>
+	<Name>雇员探险 Kai β</Name>
+	<Author>Calleil</Author>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<While Condition="True">
+			<Retainer />
+			<LogMessage Message="收完雇员，等待60分钟" />
+			<WaitTimer WaitTime="3600" />
+		</While>
+	</Order>
+</Profile>

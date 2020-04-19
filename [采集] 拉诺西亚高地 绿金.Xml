@@ -1,0 +1,38 @@
+<Profile>
+    <Name>Mining: LV45 BRONZE LAKE </Name>
+    <KillRadius>50</KillRadius>
+    <Order>
+<!-- gather Electrum Ore to decided Amount-->
+		    <If Condition="Core.Me.CurrentJob != ClassJobType.Miner">			<!-- 职业判断 -->
+			    <RunCode Name="MIN"/>											<!-- 职业切换 -->
+			    <WaitTimer WaitTime="3"/>
+		    </If>
+			<If Condition="ItemCount(5115) &lt; 396">							<!-- 道具数量判断 -->
+				<TeleportTo Name="Camp Bronze Lake" AetheryteId="15" />			<!-- 传送至采集地图 -->
+			    <Gather while="ItemCount(5115) &lt; 396">
+				    <GatherObject>Mineral Deposit</GatherObject>				<!-- 采集对象：石场、良材等 -->
+				    <HotSpots>													<!-- 热点区域设置：采集对象刷新范围 -->
+				        <HotSpot Radius="95" XYZ="425.5676, -2.748671, 180.2855" />
+				    </HotSpots>
+				    <Slot>5</Slot>												<!-- 采集格数 -->
+					<!-- <ItemNames>
+						<ItemName="绿金矿" />										道具名称，和采集格数设置二选一
+					</ItemNames> -->
+				    <GatheringSkillOrder>										<!-- 采集技能 -->
+				        <GatheringSkill SpellName="King's Yield II" TimesToCast="1" />
+				    </GatheringSkillOrder>
+			    </Gather>
+		    </If>
+<!-- TeleportTo X while finish gathering -->
+		    <If Condition="ItemCount(5115) &gt; 396">							<!-- 采集完成后传送到指定地图 -->
+                <TeleportTo Name="Revenant's Toll" AetheryteId="24" />
+		  	</If>
+    </Order>
+	<CodeChunks>
+		<CodeChunk Name="MIN">													<!-- 职业切换代码 -->
+			<![CDATA[ ff14bot.Managers.ChatManager.SendChat("/gs change 11");
+			]]>
+		</CodeChunk>
+	</CodeChunks>	
+</Profile>
+			

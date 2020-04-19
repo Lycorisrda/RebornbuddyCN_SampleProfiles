@@ -1,0 +1,51 @@
+<Profile>
+	<Name>摩杜纳塔兰道具兑换 - 强心剂</Name>
+	<Author>Lycorisrda</Author>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<If Condition="not IsOnMap(156)">
+			<TeleportTo AetheryteId="24" Name="156"/>
+		</If>
+		<NoCombatMoveTo XYZ="26.18322, 28.99997, -729.5521"/>
+		<While Condition="HasAtLeast(8030,5)" >
+			<!-- 对话选项，道具格数，用来兑换的道具ID -->
+			<RunCode Name="Exchange" />
+			<!-- <MorDhonaExchange DialogOption="8" ItemSlot="2" ItemId="8030" /> -->
+		</While>
+	</Order>
+	<CodeChunks>
+		<CodeChunk Name="Exchange" >
+		
+		<![CDATA[ 
+			// interact npc
+			ff14bot.Managers.GameObjectManager.GetObjectByNPCId(1006972).Interact();
+			// select string
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => ff14bot.RemoteWindows.SelectIconString.IsOpen);			
+			// 第一格为0, 8为食品药品
+			ff14bot.RemoteWindows.SelectIconString.ClickSlot(8);
+			await Buddy.Coroutines.Coroutine.Sleep(1000);
+			Talk.Next();
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => RaptureAtkUnitManager.GetWindowByName("ShopExchangeItem")!=null);
+			// 兑换指定道具，最后一位数字0对应道具格数，从0开始
+			RaptureAtkUnitManager.GetWindowByName("ShopExchangeItem").SendAction(2, 0, 0, 1, 2);
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => RaptureAtkUnitManager.GetWindowByName("ShopExchangeItemDialog")!=null);
+			// 交换道具
+			RaptureAtkUnitManager.GetWindowByName("ShopExchangeItemDialog").SendAction(1, 0, 0);
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => ff14bot.RemoteWindows.Request.IsOpen);
+			foreach(ff14bot.Managers.BagSlot slot in ff14bot.Managers.InventoryManager.FilledSlots)
+			{
+			// 物品ID
+				if(slot.RawItemId == 8030)
+				{
+					slot.Handover();
+				}
+			}
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => ff14bot.RemoteWindows.Request.HandOverButtonClickable);
+			ff14bot.RemoteWindows.Request.HandOver();
+			await Buddy.Coroutines.Coroutine.Wait(2000, () => !ff14bot.RemoteWindows.Request.IsOpen);
+			await Buddy.Coroutines.Coroutine.Sleep(1000);
+			RaptureAtkUnitManager.GetWindowByName("ShopExchangeItem").SendAction(1, 3, uint.MaxValue);				
+		]]>
+		</CodeChunk>
+	</CodeChunks>
+</Profile>

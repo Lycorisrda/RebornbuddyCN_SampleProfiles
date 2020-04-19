@@ -1,0 +1,14 @@
+﻿<!DOCTYPE Profile [
+<!ENTITY Item_Id "11038">   
+<!-- 上方添加需要分解的ID -->
+]>
+<Profile>
+	<Name>装备魔晶石化</Name>
+	<Author>Calleil</Author>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<While Condition="Conditioner.CanSpiritBondbyIds(&Item_Id;)">
+			<MateriaConvert ItemIds="&Item_Id;" NqOnly="False"/> <!-- 使用上方Entity部分的物品ID数组 -->
+		</While>
+  </Order>
+</Profile>

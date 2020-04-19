@@ -1,0 +1,567 @@
+<!DOCTYPE Profile [
+	<!ENTITY Location "Idyllshire">
+	<!ENTITY ShopPurchase1 "BlueToken">			<!-- 商店道具兑换1 -->
+		<!ENTITY ShopPurchase1_Count "9999">
+	<!ENTITY ShopPurchase2 "CraneFly">			<!-- 商店道具兑换2 -->
+		<!ENTITY ShopPurchase2_Count "99">
+	<!ENTITY TurnInFunction "1">  		<!-- ET7-8AM 田园郡递交道具 -->
+	<!ENTITY Retainer "1">				<!-- 雇员探险 -->
+		<!ENTITY BellLocation "16.86115, 206.6833, 53.48279"> 	<!-- 田园郡传唤铃坐标 -->
+	<!ENTITY Sit "true">             	<!-- 在渔点坐下 -->
+	<!ENTITY DesynthEnable "0">    		<!-- 鱼类分解 -->
+	<!ENTITY Fishie_Id "12721, 12770, 12794, 12819, 12730, 12836, 12721, 12805">
+	<!ENTITY ReductionEnable "1">
+	
+	<!ENTITY PipiraPira_Only "0">   	<!-- 只钓皮皮拉皮拉鱼 || 不覆盖精选设置  -->
+	<!ENTITY IlluminatiPerch_Only "1">	<!-- 只钓青蓝之手刺鱼 || 不覆盖精选设置  -->  
+	<!-- 限时精选设置 -->
+	<!ENTITY Reduction "1">             <!-- 精选总开关 -->
+		<!ENTITY Caiman "1"> 			<!-- 凯门鳄_限时-->
+		<!ENTITY ThaliakCaiman "0">		<!-- 沙利亚克鳄 	二选一 -->
+		<!ENTITY Tupuxuara "0">			<!-- 妖精翼龙   	二选一 -->
+		<!ENTITY Pteranodon "1"> 		<!-- 无齿翼龙 -->
+]>
+		<!-- 鱼饵可以是中英文道具名 -->
+		<!-- 保留名单必须是中文道具名 -->
+		<!-- 收藏品价值列表必须是英文道具名 -->
+<!--	精选详细信息
+ 	| ##########################################################################################################################################| 
+	| 起始时间	| 结束时间	| 	名称		| 等级	| 地图				| 地点				| 坐标		| 鱼饵1		| 鱼饵2			| 评价    	| 
+	| 0:00		| 6:00		| 	龙堡鲈		|  56	| 龙堡参天高地		| 宽慰河			| 31.15		| 土蜘蛛	| 以小钓大		| 效率凑合	| 
+	| 9:00		| 17:00		| 	无齿翼龙	|  58	| 翻云覆海			| 索姆阿尔云帽		| 18.4		| 红气球虫	| 以小钓大		| 效率不佳	| 
+	| 10:00		| 14:00		| 	魔帆		|  56	| 翻云覆海			| 惋惜之晶遗迹		| 20.6		| 红气球虫	| 以小钓大		| 效率不佳	| 
+	| 15:00		| 18:00		| 	妖精翼龙	|  60	| 魔大陆阿济兹拉	| 生态园			| 40.19		| 红气球虫	| 以小钓大X1X2	| 效率不佳	| 
+	| 15:00		| 18:00		| 	沙利亚克鳄	|  60	| 龙堡内陆低地		| 沙利亚克河中流	| 21.26		| 叶片钓钩	| 以小钓大		| 效率不错	| 
+	| 18:00		| 21:00		| 	凯门鳄		|  58	| 阿巴拉提云海		| 沃仙曦染			| 30.35		| 叶片钓钩	| 以小钓大		| 效率max 	| 
+	| ##########################################################################################################################################|  
+-->
+		
+<Profile>
+	<Name>[O] [捕鱼人] 皮皮拉皮拉鱼 + 青蓝之手刺鱼 + 限时精选 (带天气判断) 兼钓鱼脚本范本</Name>
+	<Author>Lycorisrda</Author>
+	<KillRadius>50</KillRadius>
+	<CodeChunks> 
+		<CodeChunk name="FishingGear">
+			<![CDATA[ff14bot.Managers.ChatManager.SendChat("/gs change 24");]]> <!-- 24 为默认钓鱼职业的套装编号 -->
+		</CodeChunk>
+		<CodeChunk Name="StopFishing">
+			<![CDATA[	SpellData data;	if(Actionmanager.CurrentActions.TryGetValue("Quit", out data))	{	await Buddy.Coroutines.Coroutine.Sleep(500);	ff14bot.Managers.Actionmanager.DoAction(299, Core.Player);	await Buddy.Coroutines.Coroutine.Sleep(2000);	}	]]>
+		</CodeChunk>
+	</CodeChunks>	
+	<Order>
+		<ExEnablePlugins Names="天气检测,启用飞行"/>	<!-- 插件启用  -->
+		<If Condition="Core.Me.CurrentJob != ClassJobType.Fisher">	<!-- 职业切换  -->
+			<WaitTimer waitTime="3"/>
+			<RunCode Name="FishingGear"/>
+			<WaitTimer waitTime="3"/>
+		</If>
+<!-- 循环开始部分  -->
+		<While Condition="Core.Me.CurrentJob == ClassJobType.Fisher">
+        <!-- 0~8 	龙堡参天高地 	皮皮拉皮拉鱼  -->		
+		  <If condition="IsTimeBetween(0,7) and &IlluminatiPerch_Only; == 0 and (SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &PipiraPira_Only; != 0)">
+				<If condition="&PipiraPira_Only; != 0">				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓皮皮拉皮拉鱼,天气不正确时会钓石蚌等等"/> 
+				</If>
+				<If condition="&PipiraPira_Only; == 0">	
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="天气正确,前往龙堡参天高地钓皮皮拉皮拉鱼"/>
+				</If>
+		   	<If Condition="not IsOnMap(398)">
+		   		<TeleportTo Name="Tailfeather" AetheryteId="76" />
+		   	</If>
+		   	<ExFish Condition="IsTimeBetween(0,7)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" snagging="true" shuffleFishSpots="true"   sitRate=".75" Collect="true">
+		   		<Baits>
+		   			<Bait name="哥布林钓钩"/>  <!-- 鱼饵可以是中英文道具名 -->
+		   			<Bait name="Brute Leech"/>
+		   		</Baits>
+		   		<Keepers>
+		   			<Keeper name="龙堡鲈"/>				<!-- 保留名单必须是中文道具名 -->
+		   			<Keeper name="皮皮拉皮拉鱼"/>
+		   			<Keeper name="石蚌"/>
+		   			<Keeper name="蓝螯虾"/>
+		   		</Keepers>
+		   		<Collectables>
+		   			<Collectable name="Whilom Catfish" value="9999"/>  <!-- 收藏品价值列表必须是英文道具名 -->
+		   			<Collectable name="Dravanian Bass" value="50" />
+		   		</Collectables>
+		   		<FishSpots>
+		   			<FishSpot XYZ="511.1775, -49.5147, 21.21878" Heading="4.513098" Sit="&Sit;" />
+		   			<FishSpot XYZ="495.9867, -50.19879, -3.111544" Heading="2.915074" Sit="&Sit;" />
+		   		</FishSpots>
+		   	</ExFish>
+			<RunCode Name="StopFishing" />
+		  </If>
+      <!-- 0~8 	龙堡内陆低地 	青蓝之手刺鱼  -->
+		  <If condition="IsTimeBetween(0,7) and &PipiraPira_Only; == 0 and (not SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &IlluminatiPerch_Only; != 0)">
+		   	<If condition="&IlluminatiPerch_Only; != 0">				
+		   		<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓青蓝之手刺鱼, 无视天气情况"/> 
+		   	</If>        
+			<If condition="&IlluminatiPerch_Only; == 0">	
+				<ExLog Color="#FF00FFFF" Name="捕鱼人" message="天气不对,钓青蓝之手"/>
+			</If>
+		   	<If condition="not IsOnMap(399)">					
+		   		<TeleportTo name="Idyllshire" aetheryteId="75"/>
+		   		<If Condition="&ReductionEnable; == 1">
+		   			<ExPurify/>		
+		   		</If>				
+		   		<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="Heading out for Illuminati Perch fishing 12am-7am. Hello blue scripts!"/>
+		   		<ExMoveTo Name="Aethereyte Touchpoint"  XYZ="70.58528, 209.25, -13.18084" />
+		   		<ExUseAethernet XYZ="77.83993, 209.25, -20.27446" Id="75" AethernetText="都市传送网" Slot="2"  />
+		   	</If>
+		   	<MoveTo XYZ="-89.84696, 100.6828, -139.2066"/>
+		   	<ExFish Condition="IsTimeBetween(0,7)" minFish="35" maxFish="45" mooch="1" Patience="Patience" shuffleFishSpots="true" sitRate=".75" Collect="true">
+		   		<Baits>
+		   			<Bait name="哥布林钓钩"/>
+		   			<Bait name="Brute Leech"/>
+		   			<Bait name="Stonefly Nymph"/>
+		   		</Baits>
+		   		<Collectables>
+		   			<Collectable name="Illuminati Perch" value="825"/>
+		   		</Collectables>
+		   		<PatienceTugs>
+		   			<PatienceTug moochLevel="0" TugType="Light"/>
+		   			<PatienceTug moochLevel="0" TugType="Medium"/>
+		   			<PatienceTug moochLevel="1" TugType="Medium"/>
+		   		</PatienceTugs> 					
+				<Keepers>
+		   			<Keeper name="青蓝之手刺鱼"/>
+				</Keepers>
+		   		<FishSpots>
+		   		<!--<FishSpot xyz="-172.9355, 100.4537, -181.7347" heading="5.81726" />
+		   			<FishSpot xyz="-141.433, 100.5589, -141.2495" heading="4.676731" /> 
+		   			<FishSpot xyz="-131.7577, 100.3345, -122.3618" heading="5.53486" /> -->
+		   			<FishSpot xyz="-74.69653, 100.519, -108.4487" heading="0.9674973" Sit="&Sit;" />
+		   			<FishSpot xyz="-66.846, 100.4848, -122.7405" heading="1.441207" Sit="&Sit;" /> <!-- OK, Tested -->
+		   		</FishSpots>
+		   	</ExFish>
+			<RunCode Name="StopFishing" />
+		  </If>
+<!-- 7~8	鱼饵购买，鱼类分解，提交青蓝之手刺鱼蓝票  -->
+			<If Condition="IsTimeBetween(7,8)" >
+				<ExPurify />
+				<If Condition="&TurnInFunction; == 0 and &Retainer; == 0">
+					<WaitWhile Condition="IsTimeBetween(7,8)" />
+				</If>
+				<If Condition="&TurnInFunction; != 0">
+						<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="Moving to turn in collectables, buy bait, and tokens if needed."/>
+						<TeleportTo name="Idyllshire" aetheryteId="75"/>
+						<ExTurnInCollectables location="&Location;" forcePurchase="false">							
+							<ShopPurchases>
+								<ShopPurchase shopItem="&ShopPurchase1;" MaxCount="&ShopPurchase1_Count;"/>
+								<ShopPurchase shopItem="&ShopPurchase2;" MaxCount="&ShopPurchase2_Count;"/>
+							</ShopPurchases> 
+						</ExTurnInCollectables>
+						<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="提交青蓝之手刺鱼蓝票，从NPC处购买鱼饵。"/>
+						<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="脚本在等待ET8AM的精选鱼之前会空闲或者自动分解鱼"/>
+				</If>
+				<If Condition="&Retainer; != 0">				
+					<ExMoveTo Distance="0.8" XYZ="&BellLocation;"/>
+					<Retainer />				
+				</If>
+				<If Condition="&DesynthEnable; != 0">
+					<While Condition="HasAtLeast(12721, 1) or HasAtLeast(12770, 1) or HasAtLeast(12794, 1) or HasAtLeast(12819, 1) or HasAtLeast(12730, 1) or HasAtLeast(12836, 1) or HasAtLeast(12721, 1) or HasAtLeast(12805, 1)">
+						<ExSalvage ItemIds="&Fishie_Id;" />
+					</While>
+				</If>
+				<WaitWhile Condition="IsTimeBetween(7,8)" />
+			</If>
+<!-- 8~14 	限时精选		无齿翼龙 -->
+			<If Condition="IsTimeBetween(8,14) and &Reduction; != 0 and &Pteranodon; != 0">
+				<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="无齿翼龙 "/>
+				<If Condition="not HasAtLeast(12708,99)">
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="没有足够的鱼饵, 购买鱼饵 !"/>
+					<TeleportTo Force="True" Name="Camp Cloudtop" AetheryteId="72"/>
+					<ExMoveTo XYZ="-650.1684, -123.7523, 523.7875" ForceLanding="True"/>
+					<BuyItem ItemId="12708" ItemCount="99" DialogOption="1" InteractDistance="3.0" NpcId="1011947" XYZ="-650.1684, -123.7523, 523.7875"/>
+				</If>
+				<TeleportTo Force="True" Name="Zenith" AetheryteId="79"/>
+				<ExMoveTo XYZ="-610.5189, 134.5717, 387.4579" Type="RandomPointWithin" Distance="10"/>
+				<ExMoveTo XYZ="-420.8228, 111.4044, 674.2472" Type="RandomPointWithin" Distance="10"/>
+				<ExMoveTo XYZ="-290.5473, -13.94905, 828.9244" Type="RandomPointWithin" Distance="10"/>
+				<WaitWhile Condition="IsTimeBetween(8,9)"/>
+				<ExFish Condition="IsTimeBetween(8,14)" CordialType="Cordial" Snagging="True" Collect="True" Patience="Patience" MinFish="21" MaxFish="42" ShuffleFishSpots="True" Mooch="5" SitRate=".69">
+					<Baits>
+						<Bait Name="Giant Crane Fly"/>
+						<Bait Name="红气球虫"/>
+					</Baits>
+					<Keepers>
+						<Keeper Name="无齿翼龙"/>
+						<Keeper Name="哥布面具"/>
+					</Keepers>
+					<FishSpots>
+						<FishSpot ApproachLocation="-244.2956, -28.30133, 839.1376" Location="-238.3459, -30.12087, 839.0236" Heading="0.4436085"/>
+						<FishSpot ApproachLocation="-244.2956, -28.30133, 839.1376" Location="-241.8419, -30.2445, 841.9512" Heading="0.512723"/>
+						<FishSpot ApproachLocation="-244.2956, -28.30133, 839.1376" Location="-244.2196, -29.99753, 843.3551" Heading="0.2676797"/>
+						<FishSpot ApproachLocation="-255.2608, -28.54438, 844.7949" Location="-250.8434, -29.73779, 847.2957" Heading="0.5420437"/>
+						<FishSpot ApproachLocation="-255.2608, -28.54438, 844.7949" Location="-254.3391, -29.76101, 849.0473" Heading="0.255111"/>
+						<FishSpot ApproachLocation="-255.2608, -28.54438, 844.7949" Location="-259.4819, -29.03571, 848.6467" Heading="0.1181555"/>
+						<FishSpot ApproachLocation="-274.5258, -28.80498, 844.8977" Location="-271.9398, -30.72771, 849.9665" Heading="0.005059242"/>
+						<FishSpot ApproachLocation="-274.5258, -28.80498, 844.8977" Location="-275.5247, -30.80584, 849.779" Heading="0.03647542"/>
+						<FishSpot ApproachLocation="-274.5258, -28.80498, 844.8977" Location="-278.9211, -31.20651, 850.0005" Heading="0.08674026"/>
+						<FishSpot ApproachLocation="-292.2478, -29.15942, 841.1709" Location="-290.3439, -30.68429, 846.6828" Heading="6.06414"/>
+						<FishSpot ApproachLocation="-292.2478, -29.15942, 841.1709" Location="-295.3916, -30.39245, 845.7479" Heading="6.076707"/>
+						<FishSpot ApproachLocation="-292.2478, -29.15942, 841.1709" Location="-300.5427, -30.09379, 844.7678" Heading="6.114407"/>
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+<!-- 8~14 	龙堡参天高地 	皮皮拉皮拉鱼  -->			
+			<If condition="IsTimeBetween(8,14) and &IlluminatiPerch_Only; == 0 and (SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &PipiraPira_Only; != 0)">
+				<If condition="&PipiraPira_Only; != 0">				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓皮皮拉皮拉鱼,天气不正确时会钓石蚌等等"/> 
+				</If>
+				<If condition="&PipiraPira_Only; == 0">	
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="天气正确,前往龙堡参天高地钓皮皮拉皮拉鱼"/>
+				</If>
+				<If Condition="not IsOnMap(398)">
+					<TeleportTo Name="Tailfeather" AetheryteId="76" />
+					<If Condition="&ReductionEnable; == 1">
+						<ExPurify/>		
+					</If>				
+				</If>
+				<MoveTo XYZ="405.3342, -42.91427, -381.6188"/>
+				<ExFish Condition="IsTimeBetween(8,14)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" snagging="true" shuffleFishSpots="true" sitRate=".75" Collect="false">
+					<Baits>
+						<Bait name="哥布林钓钩"/>
+						<Bait name="Brute Leech"/>
+					</Baits>
+					<Keepers>
+						<Keeper name="皮皮拉皮拉鱼"/>
+						<Keeper name="石蚌"/>
+						<Keeper name="蓝螯虾"/>
+					</Keepers>
+					<FishSpots>	
+						<FishSpot XYZ="403.1835, -44.4359, -373.7934" Heading="2.274313" Sit="&Sit;" />
+						<FishSpot XYZ="420.0891, -44.3789, -393.4647" Heading="5.189712" Sit="&Sit;" />
+						<FishSpot XYZ="396.4261, -42.31712, -421.2101" Heading="1.891039" Sit="&Sit;" />						
+						<FishSpot XYZ="382.3056, -21.20947, -530.9317" Heading="1.993548" Sit="&Sit;" />
+						<FishSpot XYZ="423.7709, -24.41385, -597.5521" Heading="1.691957" Sit="&Sit;" />
+						<FishSpot XYZ="589.2303, -20.53172, -570.5366" Heading="4.213609" Sit="&Sit;" />
+						<FishSpot XYZ="490.8698, -23.46298, -595.7405" Heading="1.714995" Sit="&Sit;" />
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+<!-- 8~14 	龙堡内陆低地 	青蓝之手刺鱼  -->
+			<If condition="IsTimeBetween(8,14) and &PipiraPira_Only; == 0 and (not SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &IlluminatiPerch_Only; != 0)">
+				<If condition="&IlluminatiPerch_Only; != 0">				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓青蓝之手刺鱼, 无视天气情况"/> 
+				</If>        
+				<If condition="&IlluminatiPerch_Only; == 0">	
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="天气不对,钓青蓝之手"/>
+				</If>
+				<If condition="not IsOnMap(399)">					
+					<TeleportTo name="Idyllshire" aetheryteId="75"/>
+					<If Condition="&ReductionEnable; == 1">
+						<ExPurify/>		
+					</If>				
+					<MoveTo Name="Aethereyte Touchpoint"  XYZ="70.58528, 209.25, -13.18084" />
+					<ExUseAethernet XYZ="77.83993, 209.25, -20.27446" Id="75" AethernetText="都市传送网" Slot="1"  />
+				</If>
+				<MoveTo XYZ="-89.84696, 100.6828, -139.2066"/>
+				<ExFish Condition="IsTimeBetween(8,14)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" shuffleFishSpots="true" sitRate=".75" Collect="true">
+					<Baits>
+						<Bait name="哥布林钓钩"/>
+						<Bait name="Brute Leech"/>
+						<Bait name="Stonefly Nymph"/>
+					</Baits>
+					<Collectables>
+						<Collectable name="Illuminati Perch" value="825"/>
+					</Collectables>
+					<patiencetugs>
+						<patiencetug moochlevel="0" tugtype="light"/>
+						<patiencetug moochlevel="0" tugtype="medium"/>
+						<patiencetug moochlevel="1" tugtype="medium"/>
+					</patiencetugs>
+					<Keepers>
+		   				<Keeper name="青蓝之手刺鱼"/>
+					</Keepers>
+					<FishSpots>
+						<FishSpot xyz="-74.69653, 100.519, -108.4487" heading="0.9674973" Sit="&Sit;" />
+						<FishSpot xyz="-66.846, 100.4848, -122.7405" heading="1.441207" Sit="&Sit;" />
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+<!-- 14~18	限时精选		沙利亚克鳄 -->
+			<If Condition="IsTimeBetween(14,18) and &ThaliakCaiman; != 0 and &Reduction; != 0 ">
+				<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="沙利亚克鳄_水晶簇"/>
+				<TeleportTo Force="True" AetheryteId="75" Name="Idyllshire"/>
+					<If Condition="&ReductionEnable; == 1">
+						<ExPurify/>		
+					</If>				
+				<MoveTo Name="Aethereyte Touchpoint"  XYZ="70.58528, 209.25, -13.18084" />
+				<ExUseAethernet XYZ="77.83993, 209.25, -20.27446" Id="75" AethernetText="都市传送网" Slot="2"  />
+				<ExMoveTo XYZ="-216, 103, -584" Distance="2"/>
+				<ExMoveTo XYZ="-88.10485, 180.7275, -173.6805" Type="RandomPointWithin" Distance="10"/>
+				<ExMoveTo XYZ="-87.96331, 78.26161, 120.5088" Type="RandomPointWithin" Distance="10"/>
+				<WaitWhile Condition="IsTimeBetween(14,15)"/>
+				<ExFish Condition="IsTimeBetween(14,18)" CordialType="Cordial" Snagging="True" Collect="True" Patience="Patience" MinFish="21" MaxFish="42" ShuffleFishSpots="True" Mooch="5" SitRate=".69" Bait="Bladed Steel Jig">
+					<Keepers>
+						<Keeper Name="沙利亚克鳄"/><!-- 
+						<Keeper name="狂斗鱼"/>
+						<Keeper name="香鱼"/> -->
+					</Keepers>
+					<FishSpots>
+						<FishSpot ApproachLocation="-60.66908, 53.73002, 117.7524" Location="-57.11814, 53.44373, 111.4976" Heading="1.325333"/>
+						<FishSpot ApproachLocation="-60.66908, 53.73002, 117.7524" Location="-56.71243, 53.53381, 114.3447" Heading="1.934803"/>
+						<FishSpot ApproachLocation="-60.66908, 53.73002, 117.7524" Location="-55.78923, 53.72738, 117.1822" Heading="2.010201"/>
+						<FishSpot ApproachLocation="-60.66908, 53.73002, 117.7524" Location="-55.3114, 53.95861, 120.6675" Heading="1.578755"/>
+						<FishSpot ApproachLocation="-56.11016, 54.40736, 135.385" Location="-54.64546, 54.38688, 129.2145" Heading="2.211261"/>
+						<FishSpot ApproachLocation="-56.11016, 54.40736, 135.385" Location="-52.51092, 54.43087, 131.5402" Heading="2.052086"/>
+						<FishSpot ApproachLocation="-56.11016, 54.40736, 135.385" Location="-52.46287, 54.31666, 137.6918" Heading="1.256216"/>
+						<FishSpot ApproachLocation="-56.11016, 54.40736, 135.385" Location="-54.12486, 54.05648, 141.7632" Heading="0.7598433"/>
+						<FishSpot ApproachLocation="-118.4524, 53.4724, 145.1769" Location="-122.7587, 53.20229, 149.8246" Heading="4.579679"/>
+						<FishSpot ApproachLocation="-118.4524, 53.4724, 145.1769" Location="-121.0782, 53.38816, 145.1047" Heading="4.533957"/>
+						<FishSpot ApproachLocation="-118.4524, 53.4724, 145.1769" Location="-119.9353, 53.33672, 140.5009" Heading="3.943338"/>
+						<FishSpot ApproachLocation="-118.7549, 53.46845, 129.6202" Location="-121.3646, 53.38469, 131.5921" Heading="5.769598"/>
+						<FishSpot ApproachLocation="-118.7549, 53.46845, 129.6202" Location="-122.1664, 53.29509, 128.0963" Heading="4.102459"/>
+						<FishSpot ApproachLocation="-118.7549, 53.46845, 129.6202" Location="-118.8033, 53.04623, 125.1412" Heading="4.110361"/>
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+<!-- 14~18 	限时精选		妖精翼龙 -->
+			<If Condition="IsTimeBetween(14,18) and &Tupuxuara; != 0 and &Reduction; != 0 ">
+				<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="妖精翼龙_冰晶簇"/>
+				<If Condition="&ReductionEnable; == 1">
+					<ExPurify/>		
+				</If>				
+				<If Condition="not HasAtLeast(12708,99)">
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="Not enough bait available, I'm going to buy you some !"/>
+					<TeleportTo Force="True" Name="Camp Cloudtop" AetheryteId="72"/>
+					<ExMoveTo XYZ="-650.1684, -123.7523, 523.7875" ForceLanding="True"/>
+					<BuyItem ItemId="12708" ItemCount="99" DialogOption="1" InteractDistance="3.0" NpcId="1011947" XYZ="-650.1684, -123.7523, 523.7875"/>
+				</If>
+				<TeleportTo Force="True" Name="Helix" aetheryteId="74"/>
+				<ExMoveTo XYZ="-716.1138, -186.9606, -584.3765"/>
+				<ExFlyTo XYZ="-643.3391, -133.3573, -660.6969" Radius="3.0"/>
+				<ExFlyTo XYZ="150.045, 83.63493, -305.3822" Radius="3.0"/>
+				<ExMoveTo XYZ="845.9851, 62.37205, -199.7481" Radius="3.0"/>
+				<WaitWhile Condition="IsTimeBetween(14,15)"/>
+				<ExFish Condition="IsTimeBetween(14,18)" CordialType="Cordial" Snagging="True" Collect="True" Patience="Patience" MinFish="21" MaxFish="42" ShuffleFishSpots="True" Mooch="5" SitRate=".69">
+					<Baits>
+						<Bait Name="Giant Crane Fly"/>
+						<Bait Name="Red Balloon"/>
+					</Baits>
+					<Keepers>
+						<Keeper Name="妖精翼龙"/>
+						<Keeper Name="惊龟"/>
+						<Keeper Name="眼镜蛇鱼"/>
+					<!--<Keeper Name="瓦斯鲀"/>
+						<Keeper Name="高天鱼"/>
+						<Keeper Name="天空清道夫"/> -->
+					</Keepers>
+					<Collectables>
+						<Collectable name="Stupendemys" value="1526"/>
+					</Collectables>
+					<FishSpots>
+						<FishSpot XYZ="862.0374, 30, -156.5393" Heading="1.34"/>
+						<FishSpot XYZ="878.8062, 30, -194.1158" Heading="1.34"/>
+						<FishSpot XYZ="876.6814, 30, -185.7894" Heading="1.34"/>
+						<FishSpot XYZ="873.9183, 30, -179.4828" Heading="1.34"/>
+						<FishSpot XYZ="871.2634, 30, -173.5322" Heading="1.34"/>
+						<FishSpot XYZ="869.0849, 30, -169.4196" Heading="1.34"/>
+						<FishSpot XYZ="866.287, 30, -164.3894" Heading="1.34"/>
+						<FishSpot XYZ="870.3144, 30, -170.493" Heading="1.34"/>
+						<FishSpot XYZ="877.0106, 30, -187.2638" Heading="1.34"/>
+						<FishSpot XYZ="883.927, 30, -230.4676" Heading="1.34"/>
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+				<ExPurify/>
+			</If>
+<!-- 14~16 	龙堡参天高地 	皮皮拉皮拉鱼  -->
+			<If condition="IsTimeBetween(14,16) and &IlluminatiPerch_Only; == 0 and (SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &PipiraPira_Only; != 0)">
+				<If condition="&PipiraPira_Only; != 0">				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓皮皮拉皮拉鱼,天气不正确时会钓石蚌等等"/> 
+				</If>
+				<If condition="&PipiraPira_Only; == 0">	
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="天气正确,前往龙堡参天高地钓皮皮拉皮拉鱼"/>
+				</If>		
+				<If Condition="not IsOnMap(398)">
+					<TeleportTo Name="Tailfeather" AetheryteId="76" />		
+				</If>
+				<MoveTo XYZ="405.3342, -42.91427, -381.6188"/>
+				<ExFish Condition="IsTimeBetween(14,16)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" snagging="true" shuffleFishSpots="true" sitRate=".75" Collect="false">
+					<Baits>
+						<Bait name="哥布林钓钩"/>
+						<Bait name="Brute Leech"/>
+					</Baits>
+					<Keepers>
+						<Keeper name="皮皮拉皮拉鱼"/>
+						<Keeper name="石蚌"/>
+						<Keeper name="蓝螯虾"/>
+					</Keepers>
+					<FishSpots>	
+						<FishSpot XYZ="403.1835, -44.4359, -373.7934" Heading="2.274313" Sit="&Sit;" />
+						<FishSpot XYZ="420.0891, -44.3789, -393.4647" Heading="5.189712" Sit="&Sit;" />
+						<FishSpot XYZ="396.4261, -42.31712, -421.2101" Heading="1.891039" Sit="&Sit;" />						
+						<FishSpot XYZ="382.3056, -21.20947, -530.9317" Heading="1.993548" Sit="&Sit;" />
+						<FishSpot XYZ="423.7709, -24.41385, -597.5521" Heading="1.691957" Sit="&Sit;" />
+						<FishSpot XYZ="589.2303, -20.53172, -570.5366" Heading="4.213609" Sit="&Sit;" />
+						<FishSpot XYZ="490.8698, -23.46298, -595.7405" Heading="1.714995" Sit="&Sit;" />
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+<!-- 14~16 	龙堡内陆低地 	青蓝之手刺鱼  -->
+			<If condition="IsTimeBetween(14,16) and &PipiraPira_Only; == 0 and (not SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &IlluminatiPerch_Only; != 0)">
+				<If condition="&IlluminatiPerch_Only; != 0">				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓青蓝之手刺鱼, 无视天气情况"/> 
+				</If>        
+				<If condition="&IlluminatiPerch_Only; == 0">	
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="天气不对,钓青蓝之手"/>
+				</If>
+				<If condition="not IsOnMap(399)">					
+					<TeleportTo name="Idyllshire" aetheryteId="75"/>
+					<If Condition="&ReductionEnable; == 1">
+						<ExPurify/>		
+					</If>				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="Heading out for Illuminati Perch fishing 12am-7am. Hello blue scripts!"/>
+					<MoveTo Name="Aethereyte Touchpoint"  XYZ="70.58528, 209.25, -13.18084" />
+					<ExUseAethernet XYZ="77.83993, 209.25, -20.27446" Id="75" AethernetText="都市传送网" Slot="1"  />
+				</If>
+				<MoveTo XYZ="-89.84696, 100.6828, -139.2066"/>
+				<ExFish Condition="IsTimeBetween(14,16)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" shuffleFishSpots="true" sitRate=".75" Collect="true">
+					<Baits>
+						<Bait name="哥布林钓钩"/>
+						<Bait name="Brute Leech"/>
+						<Bait name="Stonefly Nymph"/>
+					</Baits>
+					<Collectables>
+						<Collectable name="Illuminati Perch" value="825"/>
+					</Collectables>
+					<patiencetugs>
+						<patiencetug moochlevel="0" tugtype="light"/>
+						<patiencetug moochlevel="0" tugtype="medium"/>
+						<patiencetug moochlevel="1" tugtype="medium"/>
+					</patiencetugs>
+					<Keepers>
+		   				<Keeper name="青蓝之手刺鱼"/>
+					</Keepers>
+					<FishSpots>
+						<FishSpot xyz="-74.69653, 100.519, -108.4487" heading="0.9674973" />
+						<FishSpot xyz="-66.846, 100.4848, -122.7405" heading="1.441207" />
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+<!-- 16~21 	限时精选		凯门鳄 -->
+			<If Condition="IsTimeBetween(18,21) and &Caiman; != 0 and &Reduction; != 0 ">
+				<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="凯门鳄"/>
+				<TeleportTo Force="True" Name="Camp Cloudtop" AetheryteId="72"/>
+				<ExMoveTo XYZ="-602.2142, -122.2923, 554.533" Type="RandomPointWithin" Distance="5"/>
+				<ExMoveTo XYZ="205.5932, -85.20891, 659.786" Type="RandomPointWithin" Distance="10"/>
+				<ExFish Condition="IsTimeBetween(18,21)" CordialType="Cordial" Snagging="True" Collect="True" Patience="Patience" MinFish="21" MaxFish="42" ShuffleFishSpots="True" Mooch="1" SitRate=".69" Bait="Bladed Steel Jig">
+					<Keepers>
+						<Keeper Name="凯门鳄"/>
+					</Keepers>
+					<FishSpots>
+						<FishSpot Location="215.5034, -125.2895, 671.4525" Heading="0.8439589"/>
+						<FishSpot Location="220.0094, -125.2895, 683.9001" Heading="2.001313"/>
+						<FishSpot Location="233.3041, -125.2895, 679.2593" Heading="1.982463"/>
+						<FishSpot Location="257.0114, -125.2895, 656.9609" Heading="2.229974"/>
+						<FishSpot Location="251.9843, -125.2895, 647.0104" Heading="2.904369"/>
+						<FishSpot Location="226.2899, -125.2895, 630.4355" Heading="2.778706"/>
+						<FishSpot Location="214.4492, -125.2895, 637.9637" Heading="2.72202"/>
+						<FishSpot Location="215.085, -125.2895, 619.5391" Heading="1.934528"/>
+						<FishSpot Location="229.5985, -125.2895, 593.8397" Heading="1.149131"/>
+						<FishSpot Location="241.6472, -125.2895, 586.194" Heading="0.4600747"/>
+						<FishSpot Location="250.7677, -125.2895, 581.091" Heading="2.843857"/>
+						<FishSpot Location="300.3447, -125.3065, 606.1286" Heading="0.8210113"/>
+						<FishSpot Location="319.6855, -125.2895, 581.2392" Heading="2.57402"/>
+						<FishSpot Location="333.9448, -125.2895, 569.9609" Heading="1.022406"/>
+						<FishSpot Location="348.5824, -125.2895, 560.7775" Heading="0.3165946"/>
+						<FishSpot Location="390.5344, -125.2895, 588.5638" Heading="3.156595"/>
+						<FishSpot Location="401.8708, -125.2895, 613.2349" Heading="5.257271"/>
+						<FishSpot Location="400.0494, -125.2895, 627.0873" Heading="5.12323"/>
+						<FishSpot Location="401.3362, -125.2895, 651.2492" Heading="5.12323"/>
+						<FishSpot Location="390.3432, -125.2895, 672.6008" Heading="4.664553"/>
+						<FishSpot Location="398.1804, -125.2895, 694.1125" Heading="0.1406596"/>
+						<FishSpot Location="415.3872, -125.2895, 694.0579" Heading="1.677946"/>
+						<FishSpot Location="404.6691, -125.2895, 712.2839" Heading="5.424819"/>
+						<FishSpot Location="384.1033, -125.2895, 735.3852" Heading="4.27093"/>
+						<FishSpot Location="351.2265, -125.2895, 755.8721" Heading="3.586322"/>
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>			
+<!-- 16~24 	龙堡参天高地 	皮皮拉皮拉鱼  -->
+			<If condition="IsTimeBetween(16,24) and &IlluminatiPerch_Only; == 0 and (SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &PipiraPira_Only; != 0)">
+				<If condition="&PipiraPira_Only; != 0">				
+					<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓皮皮拉皮拉鱼,天气不正确时会钓石蚌等等"/> 
+				</If>
+				<If condition="&PipiraPira_Only; == 0">	
+						<ExLog Color="#FF00FFFF" Name="捕鱼人" Message="天气正确,前往龙堡参天高地钓皮皮拉皮拉鱼"/>
+				</If>
+				<If Condition="not IsOnMap(398)">
+					<TeleportTo Name="Tailfeather" AetheryteId="76" />
+				</If>    
+				<MoveTo XYZ="405.3342, -42.91427, -381.6188"/>
+				<ExFish Condition="IsTimeBetween(16,24)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" snagging="true" shuffleFishSpots="true" sitRate=".75" Collect="false">
+					<Baits>
+						<Bait name="哥布林钓钩"/>
+						<Bait name="Brute Leech"/>
+					</Baits>
+					<Keepers>
+						<Keeper name="皮皮拉皮拉鱼"/>
+						<Keeper name="石蚌"/>
+						<Keeper name="蓝螯虾"/>
+					</Keepers>
+					<FishSpots>	
+						<FishSpot XYZ="403.1835, -44.4359, -373.7934" Heading="2.274313" Sit="&Sit;" />
+						<FishSpot XYZ="420.0891, -44.3789, -393.4647" Heading="5.189712" Sit="&Sit;" />
+						<FishSpot XYZ="396.4261, -42.31712, -421.2101" Heading="1.891039" Sit="&Sit;" />					
+						<FishSpot XYZ="382.3056, -21.20947, -530.9317" Heading="1.993548" Sit="&Sit;" />
+						<FishSpot XYZ="423.7709, -24.41385, -597.5521" Heading="1.691957" Sit="&Sit;" />
+						<FishSpot XYZ="589.2303, -20.53172, -570.5366" Heading="4.213609" Sit="&Sit;" />
+						<FishSpot XYZ="490.8698, -23.46298, -595.7405" Heading="1.714995" Sit="&Sit;" />
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>			
+<!-- 16~24 	龙堡内陆低地 	青蓝之手刺鱼  -->
+			<If condition="IsTimeBetween(16,24) and &PipiraPira_Only; == 0 and (not SkywatcherPlugin.IsWeatherInZone(398, 3, 4, 11) or &IlluminatiPerch_Only; != 0)">
+		   	<If condition="&IlluminatiPerch_Only; != 0">				
+		   		<ExLog Color="#FF00FFFF" Name="捕鱼人" message="已设置只钓青蓝之手刺鱼, 无视天气情况"/> 
+		   	</If>        
+			<If condition="&IlluminatiPerch_Only; == 0">	
+				<ExLog Color="#FF00FFFF" Name="捕鱼人" message="天气不对,钓青蓝之手"/>
+			</If>
+				<If Condition="&ReductionEnable; == 1">
+					<ExPurify/>		
+				</If>				
+				<If condition="not IsOnMap(399)">					
+					<TeleportTo name="Idyllshire" aetheryteId="75"/>
+					<ExPurify/>
+					<MoveTo Name="Aethereyte Touchpoint"  XYZ="70.58528, 209.25, -13.18084" />
+					<ExUseAethernet XYZ="77.83993, 209.25, -20.27446" Id="75" AethernetText="都市传送网" Slot="1"  />
+				</If>				
+				<MoveTo XYZ="-89.84696, 100.6828, -139.2066"/>
+				<ExFish Condition="IsTimeBetween(16,24)"  minFish="35" maxFish="45" mooch="1" Patience="Patience" shuffleFishSpots="true" sitRate=".75" Collect="true">
+					<Baits>
+						<Bait name="哥布林钓钩"/>
+						<Bait name="Brute Leech"/>
+						<Bait name="Stonefly Nymph"/>
+					</Baits>
+					<Collectables>
+						<Collectable name="Illuminati Perch" value="825"/>
+					</Collectables>
+					<patiencetugs>
+						<patiencetug moochlevel="0" tugtype="light"/>
+						<patiencetug moochlevel="0" tugtype="medium"/>
+						<patiencetug moochlevel="1" tugtype="medium"/>
+					</patiencetugs>				
+					<Keepers>
+		   				<Keeper name="青蓝之手刺鱼"/>
+					</Keepers>
+					<FishSpots>
+						<FishSpot xyz="-74.69653, 100.519, -108.4487" heading="0.9674973" Sit="&Sit;" />
+						<FishSpot xyz="-66.846, 100.4848, -122.7405" heading="1.441207" Sit="&Sit;" />
+					</FishSpots>
+				</ExFish>
+				<RunCode Name="StopFishing" />
+			</If>
+		</While>			
+  </Order>
+</Profile>

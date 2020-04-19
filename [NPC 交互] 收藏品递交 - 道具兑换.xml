@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Profile [
+<!ENTITY BlueGatherToken_Count "0">				<!-- 罗薇娜的采集蓝票票据 -->
+<!ENTITY RedGatherToken_Count "0">				<!-- 罗薇娜的采集红票票据 -->
+<!ENTITY BlueCrafterToken_Count "0">			<!-- 罗薇娜的制作蓝票票据 -->
+<!ENTITY RedCrafterToken_Count "0">				<!-- 罗薇娜的制作红票票据 -->
+<!ENTITY GoblinCup_Count "0">					<!-- 哥布林青铜杯 -->
+<!ENTITY GoblinDice_Count "0">					<!-- 哥布林骰子 -->
+<!ENTITY HiCordial_Count "1">					<!-- 高级强心剂 -->
+<!ENTITY CommercialSurvivalManual_Count "0">	<!-- 商用生存学指南 -->
+<!ENTITY CommercialEngineeringManual_Count "0">	<!-- 商用工程学指南 -->
+<!ENTITY RedBalloon_Count "1">					<!-- 红气球虫 -->
+<!ENTITY MagmaWorm_Count "1">					<!-- 熔岩蠕虫 -->
+<!ENTITY FiendWorm_Count "1">					<!-- 恶魔蠕虫 -->
+<!ENTITY BruteLeech_Count "1">					<!-- 残暴水蛭 -->
+<!ENTITY CraneFly_Count "1">					<!-- 巨型大蚊 -->
+<!ENTITY KukuruPowder_Count "0">				<!-- 皇家可可豆粉 -->
+<!ENTITY BouillonCube_Count "0">				<!-- 鲜汤宝 -->
+<!ENTITY BeanSauce_Count "0">					<!-- 酱油 -->
+<!ENTITY BeanPaste_Count "0">					<!-- 味增 -->
+<!ENTITY GoldenApple_Count "0">					<!-- 金苹果 -->
+<!ENTITY SolsticeGarlic_Count "0">				<!-- 至日大蒜 -->
+<!ENTITY MatureOliveOil_Count "0">				<!-- 完熟橄榄油 -->
+<!ENTITY LoaghtanFilet_Count "0">				<!-- 洛夫坦山羊里脊 -->
+<!ENTITY PowderedMermanHorn_Count "0">			<!-- 灵兽的角粉 -->
+<!ENTITY HeavensEgg_Count "0">					<!-- 苍穹鸡蛋 -->
+<!ENTITY CarbonFiber_Count "0">					<!-- 碳纤维 -->
+<!ENTITY CrpDelineation_Count "0">
+<!ENTITY BsmDelineation_Count "0">
+<!ENTITY ArmDelineation_Count "0">
+<!ENTITY GsmDelineation_Count "0">
+<!ENTITY LtwDelineation_Count "0">
+<!ENTITY WvrDelineation_Count "0">
+<!ENTITY AlcDelineation_Count "0">
+<!ENTITY CulDelineation_Count "0">]>
+<Profile>
+	<Name>ExBuddy: 提交所有收藏品</Name>
+	<KillRadius>50</KillRadius>
+	<Order>
+		<!--<TurnInCouterfoil />-->
+		<If Condition="True">
+			<ExLog Color="#FFC0CB" Name="ExBuddy" Message="Turning in collectables "/>
+			<ExTurnInCollectables location="Idyllshire" forcePurchase="True">
+				<ShopPurchases>
+				<ShopPurchase shopItem="BlueCrafterToken" MaxCount="99999" />
+				
+				</ShopPurchases>
+			</ExTurnInCollectables>
+		</If>
+	</Order>
+  <CodeChunks>
+  </CodeChunks>
+</Profile>
